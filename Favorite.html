@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Favorites</title>
+<link rel="stylesheet" href="style-sklep.css">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link rel="shortcut icon" type="x-icon" href="image/ikonka.png">
+
+<style>
+.art-card{position:relative;}
+.card-heart{position:absolute;top:10px;right:10px;font-size:1.5rem;color:#ccc;cursor:pointer;transition:color 0.3s;}
+.card-heart.liked{color:red;}
+.no-favorites{text-align:center;margin:40px 0;font-size:1.5rem;color:#555;font-family:'Courier New';}
+.search-box{position:absolute;top:50px;right:0;display:none;background:#fff;border-radius:20px;padding:12px;width:250px;box-shadow:0 8px 20px rgba(0,0,0,0.15);font-family:'Arial',sans-serif;opacity:0;transform:translateY(-10px);transition:all 0.3s ease;z-index:100;}
+.search-box.show{display:block;opacity:1;transform:translateY(0);}
+.search-box input{width:100%;padding:8px 12px;border-radius:15px;border:1px solid #ddd;outline:none;font-size:14px;transition:all 0.3s ease;}
+.search-box input:focus{border-color:#272727;box-shadow:0 0 5px rgba(255,255,255,0.4);}
+.search-results{margin-top:8px;max-height:200px;overflow-y:auto;}
+.search-result-item{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:12px;cursor:pointer;background:#f8f8f8;margin-bottom:5px;transition:all 0.3s ease;opacity:0;transform:translateX(-10px);}
+.search-result-item.show{opacity:1;transform:translateX(0);}
+.search-result-item:hover{background:#ffece6;}
+.search-result-item img{width:40px;height:40px;border-radius:8px;object-fit:cover;}
+.search-result-item .highlight{background-color:#ffebd6;font-weight:bold;border-radius:3px;padding:1px 3px;}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="Logo"><span><img src="image/Fomen.png"></span></a>
+  <nav class="navbar">
+    <a href="index.html">Home</a>
+    <a href="#">About</a>
+    <a href="#">Login</a>
+  </nav>
+  <div class="activity-section">
+    <i class='bx bx-search' id="search-icon"></i>
+    <a href="Favorite.html"><i class='bx bx-heart'></i></a>
+    <div id="search-box" class="search-box">
+      <input type="text" id="search-input" placeholder="Search artwork...">
+      <div id="search-results" class="search-results"></div>
+    </div>
+  </div>
+</header>
+
+<section class="Więcej" id="art-gallery">
+  <h2 class="heading"><span>Favorites Gallery</span></h2>
+  <div class="artGallery" id="favorites-gallery"></div>
+</section>
+
+<script>
+const allArtworks = [
+  { name:"Rocky",img:"image/Rocky.png",link:"StoryRocky.html" },
+  { name:"Gibby",img:"image/Gibby.png",link:"#"},
+  { name:"Character Three",img:"image/art3.png",link:"#"},
+  { name:"Character Four",img:"image/art4.png",link:"#"},
+  { name:"Character Five",img:"image/art5.png",link:"#"}
+];
+
+function loadFavorites(){
+  const container=document.getElementById('favorites-gallery');
+  container.innerHTML='';
+  let favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
+  if(favorites.length===0){
+    container.innerHTML='<p class="no-favorites">You have no favorite artworks yet.</p>';return;
+  }
+  favorites.forEach(name=>{
+    const art=allArtworks.find(a=>a.name===name);
+    if(art){
+      const div=document.createElement('div');
+      div.className='art-card';
+      div.dataset.name=art.name;
+      div.dataset.img=art.img;
+      div.dataset.link=art.link;
+      div.innerHTML=`<i class='bx bx-heart card-heart liked'></i>
+        <img src="${art.img}">
+        <h3>${art.name}</h3>
+        <button class="btn btn-explore" onclick="window.location.href='${art.link}'">Read Story</button>`;
+      container.appendChild(div);
+    }
+  });
+  attachHeartListeners();
+}
+
+function attachHeartListeners(){
+  document.querySelectorAll('.card-heart').forEach(h=>{
+    h.addEventListener('click',()=>{
+      const parent=h.closest('.art-card');const name=parent.dataset.name;
+      let favorites=JSON.parse(localStorage.getItem('favorites')||'[]');
+      if(h.classList.contains('liked')){
+        favorites=favorites.filter(f=>f!==name);h.classList.remove('liked');
+      }else{favorites.push(name);h.classList.add('liked');}
+      localStorage.setItem('favorites',JSON.stringify(favorites));
+      loadFavorites();
+    });
+  });
+}
+loadFavorites();
+
+// wyszukiwarka
+const searchIcon = document.getElementById('search-icon');
+const searchBox = document.getElementById('search-box');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+searchIcon.addEventListener('click',()=>{searchBox.classList.toggle('show');searchInput.focus();searchResults.innerHTML='';});
+searchInput.addEventListener('input',()=>{
+  const q=searchInput.value.toLowerCase();searchResults.innerHTML='';
+  if(!q.trim()) return;
+  allArtworks.filter(a=>a.name.toLowerCase().includes(q)).forEach(a=>{
+    const div=document.createElement('div');div.className='search-result-item show';
+    div.innerHTML=`<img src="${a.img}" alt="${a.name}"><span>${a.name.replace(new RegExp(`(${q})`,'gi'),`<span class="highlight">$1</span>`)}</span>`;
+    div.addEventListener('click',()=>{window.location.href=a.link;});
+    searchResults.appendChild(div);
+  });
+});
+</script>
+</body>
+</html>

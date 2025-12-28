@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rocky - Art Gallery</title>
+<link rel="stylesheet" href="style-sklep.css">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link rel="shortcut icon" type="x-icon" href="image/ikonka.png">
+
+<style>
+/* Header ikony z kwadratową animacją */
+.activity-section i{
+    font-size: 25px;
+    padding: 10px;
+    border-radius: 8px; /* kwadratowe z lekko zaokrąglonymi rogami */
+    background: #e8e7e7;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.activity-section i:hover{
+    background: #585858;
+    color: #fff;
+}
+
+/* Bounce animacja dla obrazka Rocky */
+.home-section .image-section img{
+    width: 25vw;
+    animation: Bounce 4s ease forwards infinite;
+}
+@keyframes Bounce{
+    0% { transform: translateY(-24px); }
+    50% { transform: translateY(0px); }
+    100% { transform: translateY(-24px); }
+}
+
+/* Pole wyszukiwania pojawia się pod lupą */
+.search-box {
+  position: absolute;
+  top: 40px; /* bezpośrednio pod lupą */
+  right: 0; /* wyrównanie względem ikony */
+  display: none;
+  background: #fff;
+  border-radius: 15px;
+  padding: 10px;
+  width: 220px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  font-family: 'Arial', sans-serif;
+  z-index: 100;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 14px;
+}
+
+.search-results {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 5px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #f8f8f8;
+  margin-bottom: 5px;
+  transition: all 0.3s ease;
+}
+.search-result-item:hover {
+  background: #ffece6;
+}
+.search-result-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.search-result-item .highlight {
+  background-color: #ffebd6;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 1px 3px;
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <a href="index.html" class="Logo"><span><img src="image/Fomen.png"></span></a>
+    <nav class="navbar">
+        <a href="index.html">Home</a>
+        <a href="index.html">Gallery</a>
+        <a href="#">About</a>
+        <a href="#">Login</a>
+    </nav>
+    <div class="activity-section">
+        <i class='bx bx-search' id="search-icon"></i>
+        <i class='bx bx-heart' onclick="window.location.href='Favorite.html'"></i>
+    </div>
+
+    <!-- WYSZUKIWARKA POD LUPĄ -->
+    <div id="search-box" class="search-box">
+      <input type="text" id="search-input" placeholder="Search artwork...">
+      <div id="search-results" class="search-results"></div>
+    </div>
+</header>
+
+<!-- MAIN SECTION -->
+<section class="home-section" style="padding-top:120px;">
+    <div class="text-content" style="width:50%;">
+        <h2>Rocky</h2>
+        <p>
+            This is a placeholder story for Rocky.  
+            You can write the full biography, history, achievements, background story, and interesting facts here.  
+            This block will scale with the screen size and allows for a long, detailed description.  
+            Add as much text as you like to fully describe Rocky’s story.  
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eget sem sed nulla bibendum suscipit. 
+        </p>
+    </div>
+
+    <div class="image-section" style="width:45%;">
+        <img src="image/Rocky.png" alt="Rocky">
+        <div class="shadow"></div>
+    </div>
+</section>
+
+<script>
+// WYSZUKIWARKA POD LUPĄ
+const searchIcon = document.getElementById('search-icon');
+const searchBox = document.getElementById('search-box');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+const artworks = [
+    { name: "Rocky", img: "image/Rocky.png", link: "StoryRocky.html" },
+    { name: "Gibby", img: "image/Gibby.png", link: "#" },
+    { name: "Character Three", img: "image/art3.png", link: "#" },
+    { name: "Character Four", img: "image/art4.png", link: "#" },
+    { name: "Character Five", img: "image/art5.png", link: "#" }
+];
+
+searchIcon.addEventListener('click', () => {
+    searchBox.classList.toggle('show');
+    searchInput.focus();
+});
+
+searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    searchResults.innerHTML = "";
+
+    const filtered = artworks.filter(a => a.name.toLowerCase().includes(query));
+
+    filtered.forEach(a => {
+        const div = document.createElement('div');
+        div.classList.add('search-result-item');
+
+        let nameHTML = a.name;
+        if(query.length > 0){
+            const regex = new RegExp(`(${query})`, "gi");
+            nameHTML = a.name.replace(regex, `<span class="highlight">$1</span>`);
+        }
+
+        div.innerHTML = `<img src="${a.img}" alt="${a.name}"><span>${nameHTML}</span>`;
+        div.addEventListener('click', () => {
+            window.location.href = a.link;
+        });
+
+        searchResults.appendChild(div);
+    });
+});
+</script>
+
+</body>
+</html>
